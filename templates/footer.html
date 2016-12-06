@@ -1,0 +1,34 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="footer">
+    <div class="container">
+        <div class="row wrap">
+            <div class="col col-sm-2 pyconkr-badge">
+                <img src="{% static "image/telco-logo.png" %}" alt="PyCon Korea badge">
+            </div>
+            <div class="col col-sm-7 credit">
+                <h4>
+                {% trans "OAMMAN" %}
+                </h4>
+                <p>
+                {% trans "Platform Solution Team" %}
+                </p>
+                <p>
+                {% trans "Powered by Django" %}
+                </p>
+            </div>
+            <div class="col col-sm-3 info">
+                <h4>{% trans "Stay connected" %}</h4>
+                <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/telcoware">
+                    <i class="fa fa-twitter"></i>
+                </a>
+                <a class="btn btn-social-icon btn-facebook" href="https://facebook.com/telcoware">
+                    <i class="fa fa-facebook"></i>
+                </a>
+                <a class="btn btn-social-icon btn-github" href="https://github.com/telcoware/oamman">
+                    <i class="fa fa-github"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

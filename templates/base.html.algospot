@@ -1,0 +1,323 @@
+{% load avatar_tags %}
+{% load common_tags %}
+<!doctype html>
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+	<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+		<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+			<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js"> <!--<![endif]-->
+	<head>
+		<title>TelcoOAM manager {% block title %}main{% endblock %}</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="shortcut icon" href="/favicon.ico">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+		<!-- CSS Styles -->
+		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/css/colors.css">
+		<link rel="stylesheet" href="/static/css/algospot.css">
+		<link rel="stylesheet" href="/static/css/code.css">
+		<link rel="stylesheet" href="/static/css/jquery.tipsy.css">
+		<link rel="stylesheet" href="/static/css/jquery.wysiwyg.css">
+		<link rel="stylesheet" href="/static/css/jquery.datatables.css">
+		<link rel="stylesheet" href="/static/css/jquery.nyromodal.css">
+		<link rel="stylesheet" href="/static/css/jquery.datepicker.css">
+		<link rel="stylesheet" href="/static/css/jquery.fileinput.css">
+		<link rel="stylesheet" href="/static/css/jquery.fullcalendar.css">
+		<link rel="stylesheet" href="/static/css/jquery.visualize.css">
+		<link rel="stylesheet" href="/static/css/jquery-ui.css">
+		<link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+
+		<!-- Google WebFonts -->
+		<link href='//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
+
+		<script src="/static/codemirror/lib/codemirror.js"></script>
+		<script src="/static/codemirror/mode/markdown/markdown.js"></script>
+		<script src="/static/js/libs/modernizr-1.7.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script>!window.jQuery && document.write(unescape('%3Cscript src="/static/js/jquery/jquery-1.7.2.min.js"%3E%3C/script%3E'))</script>
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-7621581-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		</script>
+	</head>
+
+	<!-- Add class .fixed for fixed layout. You would need also edit CSS file for width -->
+	<body class="fixed">
+
+		<!-- Fixed Layout Wrapper -->
+		<div class="fixed-wraper">
+
+			<!-- Aside Block -->
+			<section role="navigation" class="navigation">
+				<!-- Header with logo and headline -->
+				<header>
+					<a href="/" title="처음으로"></a>
+					<!-- <h1>SINCE 2007</h1> -->
+				</header>
+
+				<!-- User Info -->
+				<section id="user-info">
+					{% if user.is_authenticated %}
+						<a href="{% url "user_profile" user.id %}">{% avatar user 45 %}</a>
+						<div>
+							{{ user|print_username }}
+							<em class="kor">
+								글 {{ user.get_profile.posts }}개,
+								문제 {{ user.get_profile.solved_problems }}개
+							</em>
+							<ul>
+								<li><a class="button-link" href="{% url "user_settings" user.id %}" title="설정" rel="tooltip">settings</a></li>
+								<li><a class="button-link" href="{% url "auth_logout" %}" title="로그아웃" rel="tooltip">sign out</a></li>
+							</ul>
+						</div>
+					{% else %}
+						<img src="/static/images/unknown-user.png" alt="Not logged in yet">
+						<div>
+							<em class="kor">로그인하세요.</em>
+							<ul>
+								{% url "auth_login" as auth_login_url %}
+								{% if request.path == auth_login_url %}
+								<li><a class="button-link" href="{{ request.get_full_path }}" title="로그인" rel="tooltip">sign in</a></li>
+								{% else %}
+								<li><a class="button-link" href="{{ auth_login_url }}?next={{ request.get_full_path|urlencode }}" title="로그인" rel="tooltip">sign in</a></li>
+								{% endif %}
+								<li><a class="button-link" href="{% url "registration_register" %}" title="회원 가입" rel="tooltip">sign up</a></li>
+							</ul>
+						</div>
+					{% endif %}
+				</section>
+				<!-- /User Info -->
+
+				<!-- Main Navigation -->
+				<nav id="main-nav" class="kor">
+					<ul>
+						<li class="{% block newsfeed_class %}{% endblock %}">
+							<a href="{% url "newsfeed" %}" class="no-submenu">
+								뉴스 피드
+							</a>
+						</li>
+						<li class="{% block forum_class %}{% endblock %}">
+							<a href="{% url "forum-all" 1 %}">
+								포럼
+							</a>
+							<ul>
+								{% for cat in forum_categories %}
+									<li class="{% if cat == category %}current{% endif %}">
+										<a href="{% url "forum-list" cat.slug 1 %}">{{ cat.name }}</a>
+									</li>
+								{% endfor %}
+							</ul>
+						</li>
+						<li class="{% block wiki_class %}{% endblock %}" >
+							<a href="{% url "wiki-detail" "Main_Page" %}" class="no-submenu">
+								위키
+							</a>
+							<ul>
+								<li class="{% block wiki_list_class %}{% endblock %}">
+									<a href="{% url "wiki-list" %}">
+										페이지 목록
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="{% block judge_class %}{% endblock %}">
+							<a href="{% url "judge-problem-list" %}" class="">
+								온라인 저지
+							</a>
+							<ul>
+								<li class="{% block judge_problem_class %}{% endblock %}">
+									<a href="{% url "judge-problem-list" %}">
+										문제 풀기
+									</a>
+								</li>
+								{% if user.get_profile.is_authorized %}
+								<li class="{% block judge_author_class %}{% endblock %}">
+									<a href="{% url "judge-problem-mine" %}">
+										문제 내기
+									</a>
+								</li>
+								{% endif %}
+								<li class="{% block judge_random_class %}{% endblock %}">
+									<a href="{% url "judge-problem-random" %}">
+										랜덤 문제 고르기
+									</a>
+								</li>
+								<li class="{% block judge_submission_class %}{% endblock %}"><a href="{% url "judge-submission-recent" %}">
+										최근 제출된 답안
+									</a>
+								</li>
+								<li class="{% block judge_ranking_class %}{% endblock %}">
+									<a href="{% url "judge-ranking" %}">
+										사용자 랭킹
+									</a>
+								</li>
+								<!--<li>-->
+								<!--	<a href="/">-->
+								<!--		대회-->
+								<!--	</a>-->
+								<!--</li>-->
+								<li>
+									<a href="{% url "wiki-detail" "알고스팟_온라인_저지" %}">
+										튜토리얼
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="{% block calendar_class %}{% endblock %}"><a href="{% url "calendar" %}" class="no-submenu">캘린더</a></li>
+						<li>
+							<a href="https://algospot.slack.com/" class="">
+								알고스팟 대화방
+							</a>
+							<ul>
+								<li class="">
+									<a href="http://algospot-slack-invitation.herokuapp.com/">
+										초대장 받기
+									</a>
+								</li>
+								<li class="">
+									<a href="https://algospot.com/wiki/read/%EC%95%8C%EA%B3%A0%EC%8A%A4%ED%8C%9F_%EC%B1%84%ED%8C%85">
+										이용 안내
+									</a>
+								</li>
+							</ul>
+						</li>
+						{% if user.is_superuser %}
+							<li><a href="/admin" class="no-submenu">관리자 페이지</a></li>
+						{% endif %}
+					</ul>
+				</nav>
+				<!-- /Main Navigation -->
+
+				<!-- Search -->
+				<section id="search">
+					<form method="get" action="{% url "haystack_search" %}">
+						<input name="q" class="search" id="search_query" placeholder="검색하기"/>
+					</form>
+					<form method="get" action="{% url "judge-problem-goto" %}">
+						<input name="slug" class="search problem_autocomplete" placeholder="AOJ 문제 바로가기"/>
+					</form>
+				</section>
+				<!-- /Search -->
+				{% for campaign in campaigns %}
+				<section id="campaign">
+					<a target="_blank" href="{{ campaign.link }}"><img src="{{ campaign.image }}"/></a>
+				</section>
+				{% endfor %}
+				<!--Sidebar -->
+				<section class="sidebar nested" id="calendar_upcoming">
+					<h2>다가오는 이벤트들</h2>
+					<span id="calendar_events_container">
+						<p class="template">
+							<a href="#" class="anchor"></a>
+							<span class="starttime"></span>
+						</p>
+					<!-- <p class="separator"><a href="#">TCO11 Marathon Match R3</a> (6/30)</p> -->
+					<!-- <p>TCO11 Marathon Match R3 (6/30)</p> -->
+					<!-- <p class="separator">SRM 511 (7/2 11:00 AM)</p> -->
+					<!-- <p class="separator">TCO11 Online Round 3 (7/9 11:00 AM)</p> -->
+					<!-- <p class="separator">SRM 512 (7/13 10:00 AM)</p> -->
+					<!-- <p class="separator">TCO11 Online Round 4 (7/23 11:00 AM)</p> -->
+					<!-- <p class="separator">SRM 513 (7/26 6:00 AM)</p> -->
+					<!-- <p class="separator">TCO11 Online Round 5 (8/6 11:00 AM)</p> -->
+					<!-- <p class="separator">SRM 514 (8/9 8:00 PM)</p> -->
+					<!-- <p class="separator">SRM 515 (8/20 11:00 AM)</p> -->
+					</span>
+					<a class="button-link" href="{% url "calendar" %}" title="See all events!">see all</a>
+				</section>
+				<section class="sidebar feed">
+
+					<a href="{% url "postfeed" %}"><img src="/static/images/rss.png"/></a>
+				</section>
+				<!-- /Sidebar -->
+			</section>
+
+			<!-- /Aside Block -->
+
+			<!-- Main Content -->
+			<section role="main" id="main_section">
+
+				<!-- Full Content Block -->
+				<!-- Note that only 1st article need clearfix class for clearing -->
+				<article class="full-block clearfix">
+
+					<!-- Article Container for safe floating -->
+					<div class="article-container">
+
+						<!-- Article Header -->
+						<header>
+							<h2>{% block page_title %}Default Page Title {% endblock %}</h2>
+							<!-- Article Header Tab Navigation -->
+							{% block page_tabs %}
+							{% endblock %}
+							<!-- /Article Header Tab Navigation -->
+						</header>
+						<!-- /Article Header -->
+
+						<!-- Article Content -->
+						{% block page_contents %}
+						{% endblock %}
+
+						<!-- Article Footer -->
+
+						<footer>
+						</footer>
+						<!-- /Article Footer -->
+
+					</div>
+					<!-- /Article Container -->
+
+				</article>
+				<!-- /Full Content Block -->
+
+				{% block other_blocks %}
+				{% endblock %}
+
+			</section>
+			<!-- /Main Content -->
+
+		</div>
+		<!-- /Fixed Layout Wrapper -->
+
+		<!-- JS Libs at the end for faster loading -->
+		<script src="/static/js/libs/selectivizr.js"></script>
+		<script src="/static/js/jquery/jquery.nyromodal.js"></script>
+		<script src="/static/js/jquery/jquery.tipsy.js"></script>
+		<script src="/static/js/jquery/jquery.wysiwyg.js"></script>
+		<script src="/static/js/jquery/jquery.datatables.js"></script>
+		<script src="/static/js/jquery/jquery.datepicker.js"></script>
+		<script src="/static/js/jquery/jquery.fileinput.js"></script>
+		<script src="/static/js/jquery/jquery.fullcalendar.min.js"></script>
+		<script src="/static/js/jquery/excanvas.js"></script>
+		<script src="/static/js/jquery/jquery.visualize.js"></script>
+		<script src="/static/js/jquery/jquery.visualize.tooltip.js"></script>
+		<script src="/static/js/jquery/superbly-tagfield.min.js"></script>
+		<script src="/static/js/jquery/jquery.cookie.js"></script>
+		<script src="/static/js/jquery/jquery.tools.overlay.min.js"></script>
+		<script src="/static/js/jquery/jquery-ui.min.js"></script>
+		<script src="/static/js/sundown.js"></script>
+		<script src="/static/js/script.js?ver=3"></script>
+		<script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+				extensions: [],
+				jax: ["input/TeX", "output/HTML-CSS"],
+				preRemoveClass: "mathjax-preview",
+				"HTML-CSS": { availableFonts: ["TeX"] }
+			});
+		</script>
+
+	</body>
+</html>
